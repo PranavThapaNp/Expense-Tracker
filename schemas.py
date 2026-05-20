@@ -14,3 +14,9 @@ class UserOut(BaseModel):
     
     class Config:
         from_attributes = True
+        
+class ExpenseCreate(BaseModel):
+    amount: float
+    category : str
+    description: str
+    
