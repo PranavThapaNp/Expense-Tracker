@@ -1,4 +1,17 @@
 from pydantic import BaseModel
+from datetime import datetime
+from enum import Enum
+
+#Categories available
+class CategoryEnum(str, Enum):
+    food_drinks = "Food & Drinks"
+    utility_bills = "Utility & Bills"
+    family_friends = "Family & Friends"
+    education = "Education"
+    transportation = "Transportation"
+    entertainment = "Entertainment"
+    health_medicine = "Health & Medicine"
+    others = "Others"
 
 #Registration Input
 class UserCreate(BaseModel):
@@ -15,8 +28,20 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
         
-class ExpenseCreate(BaseModel):
+class ExpenseBase(BaseModel):
     amount: float
-    category : str
+    category : CategoryEnum
     description: str
+
+class ExpenseCreate(ExpenseBase):
+    pass
+
+class ExpenseResponse(ExpenseBase):
+    id: int
+    owner_id: int
+    created_at: datetime
+    
+    class Config:
+        from_attributes = True
+    
     
