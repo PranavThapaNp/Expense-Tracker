@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Date
 from sqlalchemy.orm import Relationship
 from database import Base
 from datetime import datetime, timezone
@@ -25,3 +25,21 @@ class Expense(Base):
     owner =  Relationship("User", back_populates="expenses")
     
     owner_id = Column(Integer, ForeignKey("users.id"))
+
+class Budget(Base):
+    
+    __tablename__ = "budgets"
+    
+    id = Column(Integer, primary_key=True, index=True)
+
+    category = Column(String, nullable=False)
+
+    monthly_limit = Column(Float, nullable=False)
+
+    owner_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
+    
+    month = Column(Integer, nullable=False)
+    year = Column(Integer, nullable= False)

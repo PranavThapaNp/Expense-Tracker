@@ -28,6 +28,8 @@ class UserOut(BaseModel):
     class Config:
         from_attributes = True
         
+#Expenses        
+        
 class ExpenseBase(BaseModel):
     amount: float
     category : CategoryEnum
@@ -43,5 +45,19 @@ class ExpenseResponse(ExpenseBase):
     
     class Config:
         from_attributes = True
+        
+#Budget
+
+class BudgetBase(BaseModel):
+    category: CategoryEnum
+    monthly_limit: float
+
+class BudgetCreate(BudgetBase):
+    pass
+
+class BudgetResponse(BudgetBase):
+    id: int
+    owner_id: int
     
-    
+    class Config:
+        from_attributes =  True

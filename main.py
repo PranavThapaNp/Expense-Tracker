@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import auth, expenses
+from routers import auth, expenses, budget
 from database import engine, Base
 import models
 
@@ -9,6 +9,7 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(auth.router)
 app.include_router(expenses.router)
+app.include_router(budget.router)
 
 @app.get("/")
 def root():

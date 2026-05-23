@@ -191,10 +191,12 @@ def dashboard(
     current_user: id = Depends(get_current_user)
 ):
     
+    #total spent
     total = db.query(func.sum(Expense.amount)).filter(
         Expense.owner_id == current_user
     ).scalar() or 0
     
+    #Category anusar ko expense
     by_category = db.query(
         Expense.category,
         func.sum(Expense.amount)
@@ -204,7 +206,57 @@ def dashboard(
         Expense.category
     ).all()
     
-    return{
+    category_breakdown = {
+        k:v for k, v in by_category
+    }
+    
+    #Highest category expense
+    highest_category =None
+    
+    if category_breakdown:
+        highest_category = max(
+            category_breakdown,
+            key = category_breakdown.get
+        )
+        
+    # Monthly expense trend
+    monthly_data = db.query(
+        func.date_trunc("month", Expense.created_at),
+        func.sum(Expense.amount)
+        ).filter(
+            Expense.owner_id == current_user
+        ).group_by(
+            func.date_trunc("month",Expense.created_at)
+        ).all()
+        
+    monthly_trends = {
+        str(month.date()): amount
+        for month, amount in monthly_data
+    }
+    
+    #Average daily expenses
+    first_expense = db.query(
+        func.min(Expense.created_at)
+    ).filter(
+        Expense.owner_id == current_user
+    ).scalar()
+    
+    average_daily_spending = 0
+    
+    if first_expense:
+        days_active = (
+            date.today() - first_expense.date()
+        ).days + 1
+        
+        average_daily_spending = total/ days_active
+    
+    return {
         "total_spent": total,
-        "by_category": {k:v for k, v in by_category}
+        "highest_spending_category": highest_category,
+        "average_daily_spending": round(
+            average_daily_spending,
+            2
+        ),
+        "category_breakdown": category_breakdown,
+        "monthly_trends": monthly_trends
     }
