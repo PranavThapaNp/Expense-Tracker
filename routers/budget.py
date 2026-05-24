@@ -147,3 +147,55 @@ def budget_status(
         },
         "budgets" : result
     }
+    
+@router.put("/{budget_id}", response_model=BudgetResponse)
+def update_budget(
+    budget_id: int,
+    budget: BudgetCreate,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(get_current_user)
+):
+
+    existing_budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.owner_id == current_user
+    ).first()
+
+    if not existing_budget:
+        raise HTTPException(
+            status_code=404,
+            detail="Budget not found"
+        )
+
+    # Update fields
+    existing_budget.category = budget.category
+    existing_budget.monthly_limit = budget.monthly_limit
+
+    db.commit()
+    db.refresh(existing_budget)
+
+    return existing_budget
+
+
+@router.delete("/{budget_id}")
+def delete_budget(
+    budget_id: int,
+    db: Session = Depends(get_db),
+    current_user: int = Depends(get_current_user)
+):
+
+    budget = db.query(Budget).filter(
+        Budget.id == budget_id,
+        Budget.owner_id == current_user
+    ).first()
+
+    if not budget:
+        raise HTTPException(
+            status_code=404,
+            detail="Budget not found"
+        )
+
+    db.delete(budget)
+    db.commit()
+
+    return {"message": "Budget deleted successfully"}
