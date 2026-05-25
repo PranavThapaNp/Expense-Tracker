@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, date
 from enum import Enum
 
 #Categories available
@@ -61,3 +61,27 @@ class BudgetResponse(BudgetBase):
     
     class Config:
         from_attributes =  True
+
+
+#Goals
+
+class GoalCreate(BaseModel):
+    name: str
+    target_amount: float
+    target_date: date
+
+class GoalSavingsUpdate(BaseModel):
+    saved_amount: float
+
+class GoalResponse(BaseModel):
+    id: int
+    name:str
+    target_amount: float
+    saved_amount: float
+    target_date: date
+    monthly_saving_needed: float
+    owner_id: int
+    
+    class Config:
+        from_attributes = True
+    

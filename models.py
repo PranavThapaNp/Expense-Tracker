@@ -43,3 +43,16 @@ class Budget(Base):
     
     month = Column(Integer, nullable=False)
     year = Column(Integer, nullable= False)
+
+class Goal(Base):
+    
+    __tablename__ = "goals"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable= False)
+    target_amount = Column(Float, nullable=False)
+    target_date = Column(Date, nullable=False)
+    monthly_saving_needed = Column(Float, nullable=False)
+    saved_amount = Column(Float, default=0)
+    
+    owner_id = Column(Integer, ForeignKey("users.id"))
