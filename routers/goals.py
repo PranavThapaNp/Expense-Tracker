@@ -50,6 +50,7 @@ def create_goal(
         target_amount=goal.target_amount,
         target_date=goal.target_date,
         monthly_saving_needed=monthly_saving_needed,
+        saved_amount=0,
         owner_id=current_user
     )
     
@@ -176,7 +177,7 @@ def update_goal_progress(
             detail="Saved amount must be greater than 0"
         )
 
-    goal.saved_amount += progress.saved_amount
+    goal.saved_amount = (goal.saved_amount or 0) + progress.saved_amount
     
     if goal.saved_amount > goal.target_amount:
         goal.saved_amount = goal.target_amount

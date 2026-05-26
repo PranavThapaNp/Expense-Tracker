@@ -19,6 +19,11 @@ class UserCreate(BaseModel):
     email: str
     password: str
     
+#Login input:
+class UserLogin(BaseModel):
+    email: str
+    password:str
+    
 #Output without displaying password
 class UserOut(BaseModel):
     id: int

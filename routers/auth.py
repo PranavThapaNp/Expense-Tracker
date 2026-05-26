@@ -5,7 +5,7 @@ import models, schemas
 from auth.hash import hash_password, verify_password
 from auth.jwt import create_access_token
 
-router = APIRouter()
+router = APIRouter(prefix="/auth", tags=["Auth"])
 
 #DB dependency
 def get_db():
@@ -39,7 +39,7 @@ def register(user: schemas.UserCreate,db: Session = Depends(get_db)):
 
 #Login
 @router.post("/login")
-def login(user: schemas.UserCreate, db: Session = Depends(get_db)):
+def login(user: schemas.UserLogin, db: Session = Depends(get_db)):
     
     db_user = db.query(models.User).filter(models.User.email == user.email).first()
     
