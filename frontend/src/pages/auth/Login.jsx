@@ -23,9 +23,7 @@ export default function Login() {
 
       login(res.data.access_token);
 
-      // ✅ FIX HERE
-      navigate("/dashboard");
-
+      navigate("/");
     } catch (err) {
       console.log(err.response?.data);
       alert("Login failed");
@@ -33,26 +31,106 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div style={container}>
+      <div style={card}>
+        <h1 style={title}>Expense Tracker</h1>
+        <p style={subtitle}>Welcome back 👋</p>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder="email"
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          placeholder="password"
-          type="password"
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
+        <form onSubmit={handleSubmit} style={formStyle}>
+          <input
+            type="email"
+            placeholder="Email"
+            style={input}
+            onChange={(e) =>
+              setForm({ ...form, email: e.target.value })
+            }
+          />
 
-        <button type="submit">Login</button>
-      </form>
+          <input
+            type="password"
+            placeholder="Password"
+            style={input}
+            onChange={(e) =>
+              setForm({ ...form, password: e.target.value })
+            }
+          />
 
-      <p>
-        No account? <Link to="/register">Register</Link>
-      </p>
+          <button type="submit" style={button}>
+            Login
+          </button>
+        </form>
+
+        <p style={footerText}>
+          Don’t have an account?{" "}
+          <Link to="/register" style={link}>
+            Register
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }
+
+/* ================= STYLES ================= */
+
+const container = {
+  height: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  background:
+    "linear-gradient(to right, #141e30, #243b55)",
+};
+
+const card = {
+  background: "white",
+  padding: "40px",
+  borderRadius: "15px",
+  width: "350px",
+  boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+};
+
+const title = {
+  textAlign: "center",
+  marginBottom: "5px",
+};
+
+const subtitle = {
+  textAlign: "center",
+  color: "gray",
+  marginBottom: "30px",
+};
+
+const formStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "15px",
+};
+
+const input = {
+  padding: "12px",
+  borderRadius: "8px",
+  border: "1px solid #ccc",
+  fontSize: "14px",
+};
+
+const button = {
+  padding: "12px",
+  borderRadius: "8px",
+  border: "none",
+  background: "#243b55",
+  color: "white",
+  fontWeight: "bold",
+  cursor: "pointer",
+};
+
+const footerText = {
+  textAlign: "center",
+  marginTop: "20px",
+};
+
+const link = {
+  color: "#243b55",
+  fontWeight: "bold",
+  textDecoration: "none",
+};

@@ -4,7 +4,7 @@ from database import SessionLocal
 from auth.oauth2 import get_current_user
 from models import Expense
 from schemas import ExpenseCreate, ExpenseResponse
-from sqlalchemy import func
+from sqlalchemy import func, desc
 from datetime import date, datetime
 
 router = APIRouter(
@@ -46,12 +46,17 @@ def create_expense(
 @router.get("/", response_model=list[ExpenseResponse])
 def get_expenses(
     db: Session = Depends(get_db),
-    current_user: int = Depends(get_current_user)
+    current_user: int = Depends(get_current_user),
+    skip: int = Query(0),
+    limit: int = Query(10)
 ):
 
     expenses = db.query(Expense).filter(
         Expense.owner_id == current_user
-    ).all()
+    ).order_by(desc(Expense.id)) \
+     .offset(skip) \
+     .limit(limit) \
+     .all()
 
     return expenses
 

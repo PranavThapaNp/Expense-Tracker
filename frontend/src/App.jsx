@@ -4,6 +4,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import Dashboard from "./pages/Dashboard";
 
+import Home from "./pages/Home";
 import Expenses from "./pages/Expenses";
 import Budget from "./pages/Budget";
 import Goals from "./pages/Goals";
@@ -20,12 +21,20 @@ export default function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* DEFAULT */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
 
         {/* AUTH */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* HOME */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+        />
 
         {/* DASHBOARD */}
         <Route

@@ -18,129 +18,334 @@ export default function Dashboard() {
     }
   };
 
-  if (!data) return <p>Loading...</p>;
+  if (!data) return <p style={{ padding: "20px" }}>Loading...</p>;
 
-  const { analytics, budget_summary, ai_insights, goals, alerts, recent_expenses } = data;
+  const {
+    analytics,
+    budget_summary,
+    ai_insights,
+    goals,
+    alerts,
+    recent_expenses,
+  } = data;
 
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={page}>
       <Navbar />
 
-      <h1>📊 Dashboard</h1>
+      {/* ================= HEADER ================= */}
+      <div style={header}>
+        <div>
+          <h1 style={mainTitle}>📊 Financial Dashboard</h1>
+          <p style={subtitle}>
+            Monitor your expenses, savings, and financial health
+          </p>
+        </div>
+      </div>
+
+      {/* ================= TOP CARDS ================= */}
+      <div style={grid}>
+        <Card
+          title="Total Spent"
+          value={`Rs ${analytics.total_spent}`}
+        />
+
+        <Card
+          title="Remaining Budget"
+          value={`Rs ${budget_summary.total_remaining}`}
+        />
+
+        <Card
+          title="Budget Usage"
+          value={`${budget_summary.overall_percent_used}%`}
+        />
+
+        <Card
+          title="Risk Level"
+          value={ai_insights.risk_level}
+        />
+      </div>
 
       {/* ================= ANALYTICS ================= */}
-      <section>
-        <h2>Analytics</h2>
-        <p><b>Total Spent:</b> {analytics.total_spent}</p>
-        <p><b>Avg Daily Spending:</b> {analytics.average_daily_spending}</p>
-        <p><b>Highest Category:</b> {analytics.highest_spending_category}</p>
+      <section style={section}>
+        <h2 style={sectionTitle}>📈 Analytics</h2>
 
-        <h4>Category Breakdown</h4>
-        <ul>
+        <div style={grid}>
+          <InfoCard
+            label="Average Daily Spending"
+            value={`Rs ${analytics.average_daily_spending}`}
+          />
+
+          <InfoCard
+            label="Highest Spending Category"
+            value={analytics.highest_spending_category || "N/A"}
+          />
+
+          <InfoCard
+            label="Budget Status"
+            value={budget_summary.overall_status}
+          />
+
+          <InfoCard
+            label="Efficiency Score"
+            value={`${ai_insights.budget_efficiency_score}%`}
+          />
+        </div>
+
+        <h3 style={smallTitle}>Category Breakdown</h3>
+
+        <div style={categoryContainer}>
           {Object.entries(analytics.category_breakdown || {}).map(
             ([cat, val]) => (
-              <li key={cat}>
-                {cat}: {val}
-              </li>
+              <div key={cat} style={categoryCard}>
+                <p style={categoryName}>{cat}</p>
+                <h3>Rs {val}</h3>
+              </div>
             )
           )}
-        </ul>
+        </div>
       </section>
-
-      <hr />
-
-      {/* ================= BUDGET ================= */}
-      <section>
-        <h2>💰 Budget Summary</h2>
-        <p><b>Total Budget:</b> {budget_summary.total_budget}</p>
-        <p><b>Total Remaining:</b> {budget_summary.total_remaining}</p>
-        <p><b>Usage:</b> {budget_summary.overall_percent_used}%</p>
-        <p><b>Status:</b> {budget_summary.overall_status}</p>
-      </section>
-
-      <hr />
 
       {/* ================= ALERTS ================= */}
-      <section>
-        <h2>🚨 Alerts</h2>
+      <section style={section}>
+        <h2 style={sectionTitle}>🚨 Alerts</h2>
+
         {alerts.length === 0 ? (
-          <p>No alerts 🎉</p>
+          <div style={successBox}>
+            No alerts. Everything looks good 🎉
+          </div>
         ) : (
-          <ul>
-            {alerts.map((a, i) => (
-              <li key={i}>{a}</li>
-            ))}
-          </ul>
+          alerts.map((a, i) => (
+            <div key={i} style={alertBox}>
+              ⚠️ {a}
+            </div>
+          ))
         )}
       </section>
-
-      <hr />
 
       {/* ================= AI INSIGHTS ================= */}
-      <section>
-        <h2>🤖 AI Insights</h2>
+      <section style={section}>
+        <h2 style={sectionTitle}>🤖 AI Insights</h2>
 
-        <p><b>Risk Level:</b> {ai_insights.risk_level}</p>
-        <p><b>Efficiency Score:</b> {ai_insights.budget_efficiency_score}%</p>
-        <p><b>Trend:</b> {ai_insights.monthly_spending_trend}</p>
-        <p><b>Top Waste Category:</b> {ai_insights.top_waste_category}</p>
+        <div style={grid}>
+          <InfoCard
+            label="Monthly Trend"
+            value={ai_insights.monthly_spending_trend}
+          />
 
-        <h4>Overspending Categories</h4>
-        {ai_insights.overspending_categories.length === 0 ? (
-          <p>None</p>
-        ) : (
-          <ul>
-            {ai_insights.overspending_categories.map((c, i) => (
-              <li key={i}>{c}</li>
-            ))}
-          </ul>
-        )}
+          <InfoCard
+            label="Top Waste Category"
+            value={ai_insights.top_waste_category || "N/A"}
+          />
+        </div>
 
-        <h4>Saving Opportunities</h4>
-        {ai_insights.saving_opportunities.length === 0 ? (
-          <p>None</p>
-        ) : (
-          <ul>
-            {ai_insights.saving_opportunities.map((s, i) => (
-              <li key={i}>{s}</li>
-            ))}
-          </ul>
-        )}
+        <div style={{ marginTop: "20px" }}>
+          <h3 style={smallTitle}>Saving Opportunities</h3>
+
+          {ai_insights.saving_opportunities.length === 0 ? (
+            <p>No recommendations</p>
+          ) : (
+            ai_insights.saving_opportunities.map((s, i) => (
+              <div key={i} style={recommendationBox}>
+                💡 {s}
+              </div>
+            ))
+          )}
+        </div>
       </section>
-
-      <hr />
 
       {/* ================= GOALS ================= */}
-      <section>
-        <h2>🎯 Goals</h2>
-        <p><b>Active Goals:</b> {goals.active_goals}</p>
-        <p><b>Monthly Saving Needed:</b> {goals.monthly_saving_required_total}</p>
+      <section style={section}>
+        <h2 style={sectionTitle}>🎯 Goals</h2>
 
-        <ul>
+        <div style={grid}>
+          <InfoCard
+            label="Active Goals"
+            value={goals.active_goals}
+          />
+
+          <InfoCard
+            label="Monthly Saving Needed"
+            value={`Rs ${goals.monthly_saving_required_total}`}
+          />
+        </div>
+
+        <div style={{ marginTop: "20px" }}>
           {goals.goal_names.map((g, i) => (
-            <li key={i}>{g}</li>
+            <div key={i} style={goalCard}>
+              🎯 {g}
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
 
-      <hr />
-
       {/* ================= RECENT EXPENSES ================= */}
-      <section>
-        <h2>🧾 Recent Expenses</h2>
+      <section style={section}>
+        <h2 style={sectionTitle}>🧾 Recent Expenses</h2>
 
         {recent_expenses.length === 0 ? (
-          <p>No expenses</p>
+          <p>No recent expenses</p>
         ) : (
-          <ul>
+          <div style={expenseContainer}>
             {recent_expenses.map((e) => (
-              <li key={e.id}>
-                {e.amount} - {e.category} - {e.description}
-              </li>
+              <div key={e.id} style={expenseCard}>
+                <div>
+                  <h3 style={{ margin: 0 }}>{e.category}</h3>
+                  <p style={{ color: "gray", margin: "5px 0" }}>
+                    {e.description}
+                  </p>
+                </div>
+
+                <h3>Rs {e.amount}</h3>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </div>
   );
 }
+
+/* ================= COMPONENTS ================= */
+
+function Card({ title, value }) {
+  return (
+    <div style={topCard}>
+      <p style={cardLabel}>{title}</p>
+      <h2>{value}</h2>
+    </div>
+  );
+}
+
+function InfoCard({ label, value }) {
+  return (
+    <div style={infoCard}>
+      <p style={cardLabel}>{label}</p>
+      <h3>{value}</h3>
+    </div>
+  );
+}
+
+/* ================= STYLES ================= */
+
+const page = {
+  padding: "20px",
+  background: "#f4f7fb",
+  minHeight: "100vh",
+};
+
+const header = {
+  marginBottom: "30px",
+};
+
+const mainTitle = {
+  margin: 0,
+  fontSize: "32px",
+};
+
+const subtitle = {
+  color: "gray",
+  marginTop: "8px",
+};
+
+const section = {
+  background: "white",
+  padding: "20px",
+  borderRadius: "15px",
+  marginBottom: "25px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+};
+
+const sectionTitle = {
+  marginBottom: "20px",
+};
+
+const smallTitle = {
+  marginTop: "25px",
+};
+
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: "15px",
+};
+
+const topCard = {
+  background: "white",
+  padding: "20px",
+  borderRadius: "15px",
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+};
+
+const infoCard = {
+  background: "#f9fafc",
+  padding: "15px",
+  borderRadius: "12px",
+};
+
+const cardLabel = {
+  color: "gray",
+  marginBottom: "10px",
+};
+
+const categoryContainer = {
+  display: "flex",
+  flexWrap: "wrap",
+  gap: "10px",
+  marginTop: "15px",
+};
+
+const categoryCard = {
+  background: "#eef2ff",
+  padding: "15px",
+  borderRadius: "10px",
+  minWidth: "120px",
+};
+
+const categoryName = {
+  color: "#444",
+};
+
+const alertBox = {
+  background: "#ffe5e5",
+  color: "#b00020",
+  padding: "12px",
+  borderRadius: "10px",
+  marginBottom: "10px",
+};
+
+const successBox = {
+  background: "#e7f8ec",
+  color: "#1b7f3b",
+  padding: "12px",
+  borderRadius: "10px",
+};
+
+const recommendationBox = {
+  background: "#fff8e6",
+  padding: "12px",
+  borderRadius: "10px",
+  marginBottom: "10px",
+};
+
+const goalCard = {
+  background: "#edf4ff",
+  padding: "12px",
+  borderRadius: "10px",
+  marginBottom: "10px",
+};
+
+const expenseContainer = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "10px",
+};
+
+const expenseCard = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  background: "#f9fafc",
+  padding: "15px",
+  borderRadius: "10px",
+};
