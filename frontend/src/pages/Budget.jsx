@@ -12,6 +12,18 @@ export default function Budget() {
 
   const [editId, setEditId] = useState(null);
 
+  // 👉 SAME categories used in Expenses page (edit if yours differ)
+  const categories = [
+    "Food & Drinks",
+    "Utility & Bills",
+    "Family & Friends",
+    "Education",
+    "Transportation",
+    "Entertainment",
+    "Health & Medicine",
+    "Others",
+  ];
+
   useEffect(() => {
     fetchBudget();
   }, []);
@@ -29,14 +41,16 @@ export default function Budget() {
     e.preventDefault();
 
     try {
+      const payload = {
+        category: form.category,
+        monthly_limit: Number(form.monthly_limit),
+      };
+
       if (editId) {
-        await api.put(`/budgets/${editId}`, form);
+        await api.put(`/budgets/${editId}`, payload);
         setEditId(null);
       } else {
-        await api.post("/budgets/", {
-          category: form.category,
-          monthly_limit: Number(form.monthly_limit),
-        });
+        await api.post("/budgets/", payload);
       }
 
       setForm({ category: "", monthly_limit: "" });
@@ -72,9 +86,7 @@ export default function Budget() {
       {/* HEADER */}
       <div style={header}>
         <h1 style={title}>💰 Budget Overview</h1>
-        <p style={subtitle}>
-          Track and manage your monthly spending limits
-        </p>
+        <p style={subtitle}>Track and manage your monthly spending limits</p>
       </div>
 
       {/* SUMMARY CARDS */}
@@ -87,44 +99,38 @@ export default function Budget() {
 
       {/* STATUS */}
       <div
-        style={{
-          ...statusBox,
-          background:
-            data.summary.overall_status === "Over_Budget"
-              ? "#ffe5e5"
-              : data.summary.overall_status === "Warning"
-              ? "#fff7d6"
-              : "#e8f8ec",
-          color:
-            data.summary.overall_status === "Over_Budget"
-              ? "#b00020"
-              : data.summary.overall_status === "Warning"
-              ? "#8a6d00"
-              : "#1b7f3b",
-        }}
+        style={{ ...statusBox, ...getStatusStyle(data.summary.overall_status) }}
       >
         <h2 style={{ margin: 0 }}>{data.summary.overall_status}</h2>
       </div>
 
       {/* FORM */}
       <div style={formBox}>
-        <h3 style={{ marginBottom: 10 }}>
+        <h3 style={{ marginBottom: 12 }}>
           {editId ? "✏️ Update Budget" : "➕ Add Budget"}
         </h3>
 
-        <form onSubmit={handleSubmit} style={form}>
-          <input
-            placeholder="Category"
+        <form onSubmit={handleSubmit} style={formStyle}>
+          {/* CATEGORY DROPDOWN (same style as Expenses) */}
+          <select
             value={form.category}
-            onChange={(e) =>
-              setForm({ ...form, category: e.target.value })
-            }
+            onChange={(e) => setForm({ ...form, category: e.target.value })}
             style={input}
-          />
+          >
+            <option value="">Select Category</option>
 
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          {/* MONTHLY LIMIT INPUT (clean like Expenses) */}
           <input
+            type="text"
+            inputMode="numeric"
             placeholder="Monthly Limit"
-            type="number"
             value={form.monthly_limit}
             onChange={(e) =>
               setForm({ ...form, monthly_limit: e.target.value })
@@ -132,8 +138,8 @@ export default function Budget() {
             style={input}
           />
 
-          <button style={btn}>
-            {editId ? "Update" : "Create"}
+          <button type="submit" style={submitBtn}>
+            {editId ? "Update Budget" : "Add Budget"}
           </button>
         </form>
       </div>
@@ -145,16 +151,11 @@ export default function Budget() {
         <div style={budgetGrid}>
           {data.budgets.map((b, i) => (
             <div key={i} style={cardBox}>
-              {/* header */}
               <div style={cardHeader}>
                 <h3 style={{ margin: 0 }}>{b.category}</h3>
-
-                <span style={getBadge(b.status)}>
-                  {b.status}
-                </span>
+                <span style={getBadge(b.status)}>{b.status}</span>
               </div>
 
-              {/* info */}
               <div style={info}>
                 <p>Limit: Rs {b.budget_limit}</p>
                 <p>Spent: Rs {b.spent}</p>
@@ -162,7 +163,6 @@ export default function Budget() {
                 <p>Used: {b.percent_used}%</p>
               </div>
 
-              {/* progress */}
               <div style={bar}>
                 <div
                   style={{
@@ -173,7 +173,6 @@ export default function Budget() {
                 />
               </div>
 
-              {/* actions */}
               <div style={actions}>
                 <button onClick={() => handleEdit(b)} style={editBtn}>
                   Edit
@@ -195,9 +194,7 @@ export default function Budget() {
 function Card({ label, value }) {
   return (
     <div style={summaryCard}>
-      <p style={{ margin: 0, color: "gray", fontSize: 14 }}>
-        {label}
-      </p>
+      <p style={{ margin: 0, color: "gray", fontSize: 14 }}>{label}</p>
       <h2 style={{ margin: "8px 0 0 0" }}>{value}</h2>
     </div>
   );
@@ -226,6 +223,16 @@ function getColor(status) {
   if (status === "Over_budget") return "#ef4444";
   if (status === "Warning") return "#facc15";
   return "#22c55e";
+}
+
+/* optional cleaner status box styling */
+function getStatusStyle(status) {
+  if (status === "Over_Budget")
+    return { background: "#ffe5e5", color: "#b00020" };
+
+  if (status === "Warning") return { background: "#fff7d6", color: "#8a6d00" };
+
+  return { background: "#e8f8ec", color: "#1b7f3b" };
 }
 
 /* ================= STYLES ================= */
@@ -277,9 +284,10 @@ const formBox = {
   marginBottom: "20px",
 };
 
-const form = {
+const formStyle = {
   display: "flex",
-  gap: "10px",
+  flexWrap: "wrap",
+  gap: "15px",
 };
 
 const input = {
@@ -289,13 +297,14 @@ const input = {
   border: "1px solid #ddd",
 };
 
-const btn = {
-  padding: "10px 15px",
-  border: "none",
+const submitBtn = {
   background: "#2563eb",
   color: "white",
-  borderRadius: "8px",
+  border: "none",
+  padding: "12px 20px",
+  borderRadius: "10px",
   cursor: "pointer",
+  fontWeight: "bold",
 };
 
 const section = {

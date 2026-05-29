@@ -45,132 +45,205 @@ export default function Intelligence() {
     <div style={page}>
       <Navbar />
 
-      <h1 style={title}>🧠 Financial Intelligence</h1>
+      {/* HEADER */}
+      <div style={header}>
+        <h1 style={title}>🧠 Financial Intelligence</h1>
+        <p style={subtitle}>AI-powered insights for your financial health</p>
+      </div>
 
-      {/* ================= TOP CARDS ================= */}
-      <section style={grid}>
+      {/* TOP CARDS */}
+      <section style={topGrid}>
         <Card title="Total Budget" value={finance?.summary?.total_budget} />
         <Card title="Total Spent" value={finance?.summary?.total_spent} />
         <Card title="Remaining" value={finance?.summary?.remaining_budget} />
         <Card title="Status" value={finance?.summary?.status} highlight />
       </section>
 
-      {/* ================= FINANCE BREAKDOWN ================= */}
-      <section style={section}>
-        <h2 style={sectionTitle}>📊 Goals Breakdown</h2>
+      {/* MAIN GRID */}
+      <div style={mainGrid}>
+        {/* LEFT */}
+        <div style={leftCol}>
+          {/* GOALS */}
+          <section style={cardSection}>
+            <h2 style={sectionTitle}>📊 Goals Breakdown</h2>
 
-        <div style={grid2}>
-          {(finance?.goal_breakdown || []).map((g, i) => (
-            <div key={i} style={card}>
-              <h3 style={{ marginBottom: 6 }}>{g.goal}</h3>
-              <p>Remaining: ₹{g.remaining_amount}</p>
-              <p>Months Left: {g.months_left}</p>
-              <p>Monthly Required: ₹{g.monthly_required}</p>
+            <div style={grid2}>
+              {(finance?.goal_breakdown || []).map((g, i) => (
+                <div key={i} style={miniCard}>
+                  <h3 style={miniTitle}>{g.goal}</h3>
+                  <p>Remaining: Rs {g.remaining_amount}</p>
+                  <p>Months: {g.months_left}</p>
+                  <p>Monthly: Rs {g.monthly_required}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      </section>
+          </section>
 
-      {/* ================= INSIGHTS ================= */}
-      <section style={section}>
-        <h2 style={sectionTitle}>🤖 AI Insights</h2>
+          {/* FORECAST */}
+          <section style={cardSection}>
+            <h2 style={sectionTitle}>📈 7-Day Forecast</h2>
 
-        <div style={card}>
-          <p>
-            <b>Risk Level:</b> {insights?.risk_level}
-          </p>
-          <p>
-            <b>Highest Category:</b>{" "}
-            {insights?.summary?.highest_spending_category}
-          </p>
-          <p>
-            <b>Savings Potential:</b> ₹
-            {insights?.summary?.savings_potential}
-          </p>
-        </div>
+            <p style={forecastDesc}>
+              This shows your predicted daily spending for the next 7 days based on your
+              past expense patterns and AI analysis.
+            </p>
 
-        <div style={listBox}>
-          <h4>Alerts</h4>
-          {(insights?.alerts || []).length === 0 ? (
-            <p>🎉 No alerts</p>
-          ) : (
-            insights.alerts.map((a, i) => <p key={i}>⚠️ {a}</p>)
-          )}
-        </div>
-      </section>
-
-      {/* ================= SAVINGS ================= */}
-      <section style={section}>
-        <h2 style={sectionTitle}>💰 Savings Insights</h2>
-
-        <div style={grid}>
-          <Card
-            title="Daily Safe Spend"
-            value={savings?.summary?.daily_safe_spend}
-          />
-          <Card
-            title="Daily Average"
-            value={savings?.summary?.daily_average}
-          />
-          <Card title="Trend" value={savings?.summary?.spending_trend} />
-        </div>
-
-        <div style={listBox}>
-          <h4>Recommendations</h4>
-          {(savings?.recommendations || []).map((r, i) => (
-            <p key={i}>💡 {r}</p>
-          ))}
-        </div>
-      </section>
-
-      {/* ================= PREDICTIONS ================= */}
-      <section style={section}>
-        <h2 style={sectionTitle}>📈 7-Day Forecast</h2>
-
-        <div style={grid2}>
-          {(predictions?.["7_day_forecast"] || []).map((p, i) => (
-            <div key={i} style={card}>
-              <b>{p.date}</b>
-              <p>₹{p.predicted_spending}</p>
+            <div style={grid}>
+              {(predictions?.["7_day_forecast"] || []).map((p, i) => (
+                <div key={i} style={miniCard}>
+                  <h3 style={miniTitle}>{p.date}</h3>
+                  <p>Rs {p.predicted_spending}</p>
+                </div>
+              ))}
             </div>
-          ))}
+
+            <p style={footerText}>
+              Total Forecast: <b>Rs {predictions?.total_predicted_spending}</b>
+            </p>
+          </section>
         </div>
 
-        <p style={footerText}>
-          Total Forecast: <b>₹{predictions?.total_predicted_spending}</b>
-        </p>
-      </section>
+        {/* RIGHT */}
+        <div style={rightCol}>
+          {/* INSIGHTS */}
+          <section style={cardSection}>
+            <h2 style={sectionTitle}>🤖 AI Insights</h2>
+
+            <div style={miniCard}>
+              <p><b>Risk:</b> {insights?.risk_level}</p>
+              <p><b>Top Category:</b> {insights?.summary?.highest_spending_category}</p>
+              <p><b>Savings Potential:</b> Rs {insights?.summary?.savings_potential}</p>
+            </div>
+          </section>
+
+          {/* ALERTS */}
+          <section style={cardSection}>
+            <h2 style={sectionTitle}>🚨 Alerts</h2>
+
+            {(insights?.alerts || []).length === 0 ? (
+              <div style={successBox}>🎉 No alerts</div>
+            ) : (
+              insights.alerts.map((a, i) => (
+                <div key={i} style={alertBox}>⚠️ {a}</div>
+              ))
+            )}
+          </section>
+
+          {/* SAVINGS */}
+          <section style={cardSection}>
+            <h2 style={sectionTitle}>💰 Savings</h2>
+
+            <div style={miniCard}>
+              <p><b>Safe Spend:</b> {savings?.summary?.daily_safe_spend}</p>
+              <p><b>Average:</b> {savings?.summary?.daily_average}</p>
+              <p><b>Trend:</b> {savings?.summary?.spending_trend}</p>
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              {(savings?.recommendations || []).map((r, i) => (
+                <div key={i} style={recommendationBox}>💡 {r}</div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ================= COMPONENT ================= */
+
 function Card({ title, value, highlight }) {
   return (
-    <div style={{ ...card, borderLeft: highlight ? "4px solid #4f46e5" : "" }}>
-      <h4 style={{ marginBottom: 5 }}>{title}</h4>
-      <p style={{ fontSize: 18, fontWeight: "bold" }}>{value}</p>
+    <div style={{ ...topCard, borderLeft: highlight ? "4px solid #4f46e5" : "" }}>
+      <p style={muted}>{title}</p>
+      <h2 style={{ margin: 0 }}>{value}</h2>
     </div>
   );
 }
 
 /* ================= STYLES ================= */
+
 const page = {
-  padding: "20px",
-  background: "#f6f7fb",
+  padding: "28px",
+  background: "#f4f7fb",
   minHeight: "100vh",
+  fontFamily: "Inter, system-ui, sans-serif",
+  color: "#1f2937",
+};
+
+const header = {
+  marginBottom: "22px",
 };
 
 const title = {
-  marginBottom: "20px",
+  margin: 0,
+  fontSize: "30px",
+  fontWeight: "700",
 };
 
-const section = {
-  marginTop: "25px",
+const subtitle = {
+  color: "#6b7280",
+  marginTop: "6px",
+  fontSize: "14px",
+};
+
+const topGrid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(4, 1fr)",
+  gap: "16px",
+  marginBottom: "22px",
+};
+
+const mainGrid = {
+  display: "grid",
+  gridTemplateColumns: "2fr 1fr",
+  gap: "18px",
+};
+
+const leftCol = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "16px",
+};
+
+const rightCol = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "16px",
+};
+
+const cardSection = {
+  background: "white",
+  padding: "18px",
+  borderRadius: "14px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
 };
 
 const sectionTitle = {
-  marginBottom: "10px",
+  marginBottom: "14px",
+  fontSize: "16px",
+  fontWeight: "600",
+};
+
+const topCard = {
+  background: "white",
+  padding: "18px",
+  borderRadius: "14px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+};
+
+const miniCard = {
+  background: "#f9fafc",
+  padding: "14px",
+  borderRadius: "12px",
+  fontSize: "14px",
+  lineHeight: "1.6",
+};
+
+const miniTitle = {
+  marginBottom: "6px",
+  fontSize: "15px",
 };
 
 const grid = {
@@ -185,23 +258,34 @@ const grid2 = {
   gap: "12px",
 };
 
-const card = {
-  background: "white",
-  padding: "15px",
-  borderRadius: "12px",
-  boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+const alertBox = {
+  background: "#ffe5e5",
+  padding: "10px",
+  borderRadius: "10px",
+  marginBottom: "8px",
 };
 
-const listBox = {
-  marginTop: "15px",
-  padding: "15px",
-  background: "white",
-  borderRadius: "12px",
+const successBox = {
+  background: "#e7f8ec",
+  padding: "10px",
+  borderRadius: "10px",
+};
+
+const recommendationBox = {
+  background: "#fff8e6",
+  padding: "10px",
+  borderRadius: "10px",
+  marginBottom: "8px",
 };
 
 const footerText = {
-  marginTop: "15px",
-  fontSize: "16px",
+  marginTop: "14px",
+  fontSize: "14px",
+};
+
+const muted = {
+  color: "#6b7280",
+  fontSize: "13px",
 };
 
 const loadingStyle = {
@@ -209,5 +293,13 @@ const loadingStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  fontSize: "18px",
+  fontSize: "16px",
+};
+
+const forecastDesc = {
+  marginTop: "-6px",
+  marginBottom: "14px",
+  fontSize: "13px",
+  color: "#6b7280",
+  lineHeight: "1.5",
 };

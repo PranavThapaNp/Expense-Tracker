@@ -61,7 +61,7 @@ export default function Home() {
 
           <div style={aboutCard}>
             <img
-              src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e"
+              src="/images/pranavthapa.jpg"
               alt="Developer"
               style={aboutImage}
             />
@@ -88,7 +88,7 @@ export default function Home() {
           </p>
 
           <p style={contactText}>
-            📱 Phone: +977-9863385107
+            📱 Phone: +977-9763385107
           </p>
 
           <p style={contactDescription}>

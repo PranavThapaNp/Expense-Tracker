@@ -12,6 +12,18 @@ export default function Expenses() {
   const [page, setPage] = useState(1);
   const limit = 5;
 
+  // ================= CATEGORY OPTIONS =================
+  const categories = [
+    "Food & Drinks",
+    "Utility & Bills",
+    "Family & Friends",
+    "Education",
+    "Transportation",
+    "Entertainment",
+    "Health & Medicine",
+    "Others",
+  ];
+
   // form state
   const [form, setForm] = useState({
     amount: "",
@@ -170,8 +182,10 @@ export default function Expenses() {
         </h2>
 
         <form onSubmit={handleSubmit} style={formStyle}>
+          {/* AMOUNT INPUT */}
           <input
-            type="number"
+            type="text"
+            inputMode="numeric"
             placeholder="Amount"
             value={form.amount}
             onChange={(e) =>
@@ -183,8 +197,8 @@ export default function Expenses() {
             style={input}
           />
 
-          <input
-            placeholder="Category"
+          {/* CATEGORY DROPDOWN */}
+          <select
             value={form.category}
             onChange={(e) =>
               setForm({
@@ -193,8 +207,17 @@ export default function Expenses() {
               })
             }
             style={input}
-          />
+          >
+            <option value="">Select Category</option>
 
+            {categories.map((cat) => (
+              <option key={cat} value={cat}>
+                {cat}
+              </option>
+            ))}
+          </select>
+
+          {/* DESCRIPTION */}
           <input
             placeholder="Description"
             value={form.description}
@@ -370,6 +393,7 @@ const input = {
   border: "1px solid #d1d5db",
   outline: "none",
   fontSize: "14px",
+  background: "white",
 };
 
 const submitBtn = {

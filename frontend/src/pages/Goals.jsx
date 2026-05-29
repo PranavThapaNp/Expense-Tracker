@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 
 export default function Goals() {
   const [goals, setGoals] = useState([]);
+  const [progress, setProgress] = useState({});
 
   const [form, setForm] = useState({
     name: "",
@@ -11,9 +12,10 @@ export default function Goals() {
     target_date: "",
   });
 
-  const [progress, setProgress] = useState({});
+  useEffect(() => {
+    fetchGoals();
+  }, []);
 
-  // FETCH
   const fetchGoals = async () => {
     try {
       const res = await api.get("/goals/");
@@ -23,11 +25,6 @@ export default function Goals() {
     }
   };
 
-  useEffect(() => {
-    fetchGoals();
-  }, []);
-
-  // CREATE
   const createGoal = async (e) => {
     e.preventDefault();
 
@@ -41,13 +38,11 @@ export default function Goals() {
     fetchGoals();
   };
 
-  // DELETE
   const deleteGoal = async (id) => {
     await api.delete(`/goals/${id}`);
     fetchGoals();
   };
 
-  // ADD PROGRESS
   const addProgress = async (id) => {
     await api.put(`/goals/${id}/progress`, {
       saved_amount: Number(progress[id] || 0),
@@ -64,48 +59,52 @@ export default function Goals() {
       {/* HEADER */}
       <div style={header}>
         <h1 style={title}>🎯 Financial Goals</h1>
-        <p style={subtitle}>Track your savings targets and progress</p>
+        <p style={subtitle}>Track and achieve your savings targets</p>
       </div>
 
       {/* CREATE FORM */}
-      <form onSubmit={createGoal} style={formStyle}>
-        <input
-          placeholder="Goal Name"
-          value={form.name}
-          onChange={(e) =>
-            setForm({ ...form, name: e.target.value })
-          }
-          style={input}
-        />
+      <div style={formBox}>
+        <h2 style={sectionTitle}>➕ Create New Goal</h2>
 
-        <input
-          type="number"
-          placeholder="Target Amount"
-          value={form.target_amount}
-          onChange={(e) =>
-            setForm({ ...form, target_amount: e.target.value })
-          }
-          style={input}
-        />
+        <form onSubmit={createGoal} style={form}>
+          <input
+            placeholder="Goal Name"
+            value={form.name}
+            onChange={(e) =>
+              setForm({ ...form, name: e.target.value })
+            }
+            style={input}
+          />
 
-        <input
-          type="date"
-          value={form.target_date}
-          onChange={(e) =>
-            setForm({ ...form, target_date: e.target.value })
-          }
-          style={input}
-        />
+          {/* ✅ spinner removed */}
+          <input
+            type="text"
+            inputMode="numeric"
+            placeholder="Target Amount"
+            value={form.target_amount}
+            onChange={(e) =>
+              setForm({ ...form, target_amount: e.target.value })
+            }
+            style={input}
+          />
 
-        <button type="submit" style={btnPrimary}>
-          Create Goal
-        </button>
-      </form>
+          <input
+            type="date"
+            value={form.target_date}
+            onChange={(e) =>
+              setForm({ ...form, target_date: e.target.value })
+            }
+            style={input}
+          />
+
+          <button style={btnPrimary}>Create Goal</button>
+        </form>
+      </div>
 
       {/* GOALS GRID */}
       <div style={grid}>
         {goals.length === 0 ? (
-          <p>No goals yet</p>
+          <div style={emptyBox}>No goals yet 🎯</div>
         ) : (
           goals.map((g) => {
             const percent =
@@ -115,6 +114,7 @@ export default function Goals() {
 
             return (
               <div key={g.id} style={card}>
+                {/* HEADER */}
                 <div style={cardHeader}>
                   <h3 style={{ margin: 0 }}>{g.name}</h3>
 
@@ -126,18 +126,24 @@ export default function Goals() {
                   </button>
                 </div>
 
-                <div style={stats}>
+                {/* INFO */}
+                <div style={info}>
                   <p>🎯 Target: Rs {g.target_amount}</p>
                   <p>💰 Saved: Rs {g.saved_amount}</p>
-                  <p>📉 Remaining: Rs {g.target_amount - g.saved_amount}</p>
-                  <p>⚡ Monthly Need: Rs {g.monthly_saving_needed}</p>
+                  <p>
+                    📉 Remaining: Rs{" "}
+                    {g.target_amount - g.saved_amount}
+                  </p>
+                  <p>
+                    ⚡ Monthly Need: Rs {g.monthly_saving_needed}
+                  </p>
                 </div>
 
                 {/* PROGRESS BAR */}
-                <div style={progressBar}>
+                <div style={bar}>
                   <div
                     style={{
-                      ...progressFill,
+                      ...fill,
                       width: `${Math.min(percent, 100)}%`,
                     }}
                   />
@@ -150,7 +156,8 @@ export default function Goals() {
                 {/* ADD PROGRESS */}
                 <div style={progressBox}>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="Add savings"
                     value={progress[g.id] || ""}
                     onChange={(e) =>
@@ -159,7 +166,7 @@ export default function Goals() {
                         [g.id]: e.target.value,
                       })
                     }
-                    style={inputSmall}
+                    style={smallInput}
                   />
 
                   <button
@@ -178,65 +185,82 @@ export default function Goals() {
   );
 }
 
-/* ================= STYLES ================= */
-
 const page = {
-  padding: "20px",
+  padding: "28px",
   background: "#f4f7fb",
   minHeight: "100vh",
+  fontFamily: "Inter, system-ui, sans-serif",
+  color: "#1f2937",
 };
 
 const header = {
-  marginBottom: "20px",
+  marginBottom: "22px",
 };
 
 const title = {
-  fontSize: "30px",
   margin: 0,
+  fontSize: "30px",
+  fontWeight: "700",
 };
 
 const subtitle = {
-  color: "gray",
+  color: "#6b7280",
+  marginTop: "6px",
+  fontSize: "14px",
 };
 
-const formStyle = {
+const formBox = {
+  background: "white",
+  padding: "18px",
+  borderRadius: "14px",
+  marginBottom: "22px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+};
+
+const sectionTitle = {
+  marginBottom: "14px",
+  fontSize: "16px",
+  fontWeight: "600",
+};
+
+const form = {
   display: "flex",
-  gap: "10px",
   flexWrap: "wrap",
-  marginBottom: "25px",
+  gap: "12px",
 };
 
 const input = {
-  padding: "10px",
-  borderRadius: "8px",
-  border: "1px solid #ccc",
-  flex: "1",
+  flex: 1,
   minWidth: "200px",
+  padding: "12px",
+  borderRadius: "10px",
+  border: "1px solid #d1d5db",
+  fontSize: "14px",
 };
 
-const inputSmall = {
-  padding: "8px",
-  borderRadius: "8px",
-  border: "1px solid #ccc",
-  width: "120px",
+const smallInput = {
+  padding: "10px",
+  borderRadius: "10px",
+  border: "1px solid #d1d5db",
+  width: "140px",
 };
 
 const btnPrimary = {
   background: "#2563eb",
   color: "white",
   border: "none",
-  padding: "10px 16px",
-  borderRadius: "8px",
+  padding: "12px 18px",
+  borderRadius: "10px",
+  fontWeight: "600",
   cursor: "pointer",
-  fontWeight: "bold",
 };
 
 const btnSecondary = {
   background: "#22c55e",
   color: "white",
   border: "none",
-  padding: "8px 12px",
-  borderRadius: "8px",
+  padding: "10px 14px",
+  borderRadius: "10px",
   cursor: "pointer",
 };
 
@@ -244,8 +268,8 @@ const deleteBtn = {
   background: "#ef4444",
   color: "white",
   border: "none",
-  padding: "6px 10px",
-  borderRadius: "6px",
+  padding: "8px 12px",
+  borderRadius: "8px",
   cursor: "pointer",
 };
 
@@ -257,9 +281,9 @@ const grid = {
 
 const card = {
   background: "white",
-  padding: "15px",
-  borderRadius: "12px",
-  boxShadow: "0 4px 10px rgba(0,0,0,0.05)",
+  padding: "18px",
+  borderRadius: "14px",
+  boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
 };
 
 const cardHeader = {
@@ -268,35 +292,42 @@ const cardHeader = {
   alignItems: "center",
 };
 
-const stats = {
+const info = {
   marginTop: "10px",
-  color: "#444",
   fontSize: "14px",
+  color: "#4b5563",
   lineHeight: "1.6",
 };
 
-const progressBar = {
-  width: "100%",
+const bar = {
   height: "8px",
   background: "#e5e7eb",
   borderRadius: "999px",
-  marginTop: "10px",
+  marginTop: "12px",
+  overflow: "hidden",
 };
 
-const progressFill = {
+const fill = {
   height: "100%",
   background: "#2563eb",
-  borderRadius: "999px",
 };
 
 const percentText = {
   fontSize: "12px",
-  color: "gray",
-  marginTop: "5px",
+  color: "#6b7280",
+  marginTop: "6px",
 };
 
 const progressBox = {
   display: "flex",
-  gap: "8px",
-  marginTop: "10px",
+  gap: "10px",
+  marginTop: "12px",
+};
+
+const emptyBox = {
+  padding: "20px",
+  background: "white",
+  borderRadius: "14px",
+  color: "#6b7280",
+  textAlign: "center",
 };

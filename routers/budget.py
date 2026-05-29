@@ -118,6 +118,7 @@ def budget_status(
             status = "Safe"
         
         result.append({
+            "id": budget.id,
             "category": budget.category,
             "budget_limit": budget.monthly_limit,
             "spent": spent,
